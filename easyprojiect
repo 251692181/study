@@ -1,0 +1,59 @@
+#define   _CRT_SECURE_NO_WARNINGS
+#include <Windows.h>
+#include "resource.h"
+#include <stdio.h>
+
+
+INT_PTR WINAPI msg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	switch (uMsg)
+	{
+	case WM_INITDIALOG:
+		SetWindowText(hWnd, "消息测试");
+		break;
+	case WM_CLOSE:
+		EndDialog(hWnd, IDCANCEL);
+		MessageBox(hWnd,"系统关闭了","测试",0);
+		break;
+	case WM_LBUTTONDOWN:
+		{
+			short x = LOWORD(lParam);
+			short y = HIWORD(lParam);
+			char s[256];
+			sprintf(s, "你点击了:x=%d y=%d",x, y);
+			SetWindowText(hWnd, s);
+			break;
+		}
+		//MessageBox(hWnd, "左键", "测试", 0);
+	case WM_RBUTTONDOWN:
+		MessageBox(hWnd, "右键", "测试", 0);
+		break;
+	case WM_MOUSEMOVE:
+		{
+			short x = LOWORD(lParam);
+			short y = HIWORD(lParam);
+			char s[256];
+			sprintf(s, "光标移动:x=%d y=%d", x, y);
+			SetWindowText(hWnd, s);
+			break;
+		}
+		
+	}
+	return FALSE;
+}
+
+
+int WINAPI WinMain(HINSTANCE hIstance, HINSTANCE hPrev, LPSTR lpCmd, int nShow) {
+
+	DialogBox(hIstance, (LPSTR)ID_test, NULL, msg);
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
