@@ -1,162 +1,287 @@
-#include"resource.h"
-#include<windows.h>
-#include<stdio.h>
+#define  _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <Windows.h>
 
-double GetDlgItemDouble(HWND hwnd,UINT nID){
-	char s[256];
-	GetDlgItemText(hwnd, nID, s, sizeof(s));
-	return atof(s);
-}
-void SetGetDlgItemDouble(HWND hwnd, UINT nID,double num) {
-	char s[256];
-	sprintf_s(s, "%lf", num);
-	SetDlgItemText(hwnd, nID, s);
-	
-}
+using namespace std;
 
-   //窗口居中
-void OnInitDialog(HWND hwndDlg) {
+struct sClass {
 
-	RECT rect;
-	GetWindowRect(hwndDlg, &rect);//得到显示器大小
-	int cx = GetSystemMetrics(SM_CXFULLSCREEN);
-    int cy= GetSystemMetrics(SM_CYFULLSCREEN);
-	
-	int x = (cx - rect.right) / 2;
-	int y = (cy - rect.bottom) / 2;
-	//屏幕居中
-	MoveWindow(hwndDlg, x, y, rect.right, rect.bottom, FALSE);
-}
+	int nUmber;
+	string name;
+	float vale;
+}SBClass[10];
 
-void OnCal(HWND hwndDlg) {
+int login() {
+	    string user;
+		string psd;
+	puts("请输入账号");
+	getline(cin, user);
+	puts("请输入密码");
+	getline(cin, psd);
 
-	double x = GetDlgItemDouble(hwndDlg, IDC_L1);
-	double y = GetDlgItemDouble(hwndDlg, IDC_R1);
-	SetGetDlgItemDouble(hwndDlg, IDC_RE, x + y);
-
-	x = GetDlgItemDouble(hwndDlg, IDC_L2);
-	y = GetDlgItemDouble(hwndDlg, IDC_R2);
-	SetGetDlgItemDouble(hwndDlg, IDC_RE2, x - y);
-
-	x = GetDlgItemDouble(hwndDlg, IDC_L3);
-	y = GetDlgItemDouble(hwndDlg, IDC_R3);
-	SetGetDlgItemDouble(hwndDlg, IDC_RE3, x * y);
-
-	x = GetDlgItemDouble(hwndDlg, IDC_L4);
-	y = GetDlgItemDouble(hwndDlg, IDC_R4);
-	if (x != 0)
-		SetGetDlgItemDouble(hwndDlg, IDC_RE4, x / y);
-	else
-		SetDlgItemText(hwndDlg, IDC_RE4, "除数不能为0");
-
-	/*
-	double x = GetDlgItemInt(hwndDlg, IDC_L1, NULL, TRUE);
-	double y = GetDlgItemInt(hwndDlg, IDC_R1, NULL, TRUE);
-	SetDlgItemInt(hwndDlg, IDC_RE, x + y, TRUE);
-
-	x = GetDlgItemInt(hwndDlg, IDC_L2, NULL, TRUE);
-	y = GetDlgItemInt(hwndDlg, IDC_R2, NULL, TRUE);
-	SetDlgItemInt(hwndDlg, IDC_RE2, x - y, TRUE);
-
-	x = GetDlgItemInt(hwndDlg, IDC_L3, NULL, TRUE);
-	y = GetDlgItemInt(hwndDlg, IDC_R3, NULL, TRUE);
-	SetDlgItemInt(hwndDlg, IDC_RE3, x * y, TRUE);
-
-	x = GetDlgItemInt(hwndDlg, IDC_L4, NULL, TRUE);
-	y = GetDlgItemInt(hwndDlg, IDC_R4, NULL, TRUE);
-	if (x!=0)
-	SetDlgItemInt(hwndDlg, IDC_RE4, x / y, TRUE);
-	else
-	SetDlgItemText(hwndDlg, IDC_RE4, "除数不能为0");
-
-	SetDlgItemInt(hwndDlg, IDC_RE4, x / y, TRUE);*/
-
-}
-
-
-INT_PTR CALLBACK pro(HWND hwndDlg,UINT uMsg, WPARAM wParam, LPARAM lParam)
-{	
-	switch (uMsg) {
-
-	case WM_INITDIALOG:
-		OnInitDialog(hwndDlg);
-		
-		return TRUE;	
-
-	case WM_COMMAND://命令消息
-		if (LOWORD(wParam) == IDOK)
-		{
-			OnCal(hwndDlg);
-			return TRUE;
-		}
-
-		if (LOWORD(wParam)==IDCANCEL)
-		{
-			EndDialog(hwndDlg, IDCANCEL);
-		}
-		break;
-
-		
+	if (user=="anatagasuki"&&psd=="abc123")
+		return 0;
+	else {
+		return 1;
 	}
-	return 0;
 }
 
 
 
+void menu() {
+	puts("1.浏览学生信息");
+	puts("2.添加学生信息");
+	puts("3.删除学生信息");
+	puts("4.修改学生信息");
+	puts("5.查找学生信息");
+	puts("0.退出---");
+	
+}
 
-void Onlogin(HWND hWndDlg) {
-	//登录界面
-	char name[32], PWD[32];
-	GetDlgItemText(hWndDlg, IDC_user, name, sizeof(name));
-	GetDlgItemText(hWndDlg, IDC_PWD, PWD, sizeof(PWD));
-	if (strcmp(name,"hacker")||strcmp(PWD,"123456"))
+
+void save() {
+
+	FILE * pf = fopen("student.fp", "w");
+	int i = 0;
+	if (!pf)
 	{
-		MessageBox(hWndDlg, "用户名或者密码错误！请重新输入", "错误",MB_OK);
+		puts("保存数据失败");
 		return ;
 	}
-	EndDialog(hWndDlg, IDOK);
+	while (SBClass[i].nUmber)
+	{
+		if (-1 != SBClass[i].nUmber)
+			fwrite(&SBClass[i], 1, sizeof(sClass), pf);
+		i++;	
+	}
+	fclose(pf);
+}
+
+void Read() {
+	FILE * pf = fopen("student.fp", "r");
+	if (!pf)
+	{
+		puts("读取数据失败");
+		return;
+	}
+	int i = 0;
+	while (fread(&SBClass[i], 1, sizeof(sClass), pf) > 0) i++;
+
+	fclose(pf);
+
+}
+void see() {
+
+	int i = 0;
+	while (SBClass[i].nUmber)
+	{
+		if(SBClass[i].nUmber>0)
+		cout << "学号：" << SBClass[i].nUmber << "  姓名：" << SBClass[i].name << "   成绩：" << SBClass[i].vale << endl;
+		i++;
+
+	}
+	cout << "一共有" << i << "条数据" << endl;
+	
+	system("pause");
 
 }
 
-INT_PTR CALLBACK logPro(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-
-	switch (uMsg)
+void add(){
+	int i = 0;
+	char c=0;
+	while (1)
 	{
-	case WM_INITDIALOG:
-		OnInitDialog(hwndDlg);
-		return TRUE;
-	case WM_COMMAND:
-		if (LOWORD(wParam)==IDCANCEL)
+		while (SBClass[i].nUmber>0)i++;
+		while (true)
 		{
-			EndDialog(hwndDlg, IDCANCEL);  //退出程序
-			return TRUE;
+			puts("请输入学号：");
+			cin >> SBClass[i].nUmber;
+			cin.get();
+			puts("请输入姓名：");
+			getline(cin, SBClass[i].name);
+			puts("请输入成绩：");
+			cin >> SBClass[i].vale;
+			cin.get();
+			cout << "输入的学号是：" << SBClass[i].nUmber << "   输入的姓名是：" << SBClass[i].name << "   输入的成绩是：" << SBClass[i].vale << endl;
+			if (cin.fail())
+			{
+				cout << "请重新输入\a" << endl;
+				cin.clear();
+				cin.ignore(100, '\n');
+				continue;
+			}
+			break;
 		}
-		if (LOWORD(wParam) == IDOK)
+		save();
+		puts("是否继续....Y/N");
+		while (1) {
+			cin >> c;
+			cin.get();
+			if (c == 'n' || c == 'N' || c == 'y' || c == 'Y') {
+				system("cls");
+				break;
+			}
+			else {
+				cout << "请重新输入\a" << endl;
+				cin.clear();
+				cin.ignore(100, '\n');
+			}
+		
+		}
+		if (c == 'n' || c == 'N')break;
+	}
+}
+
+void delt(){
+	see();
+	int num;
+	char c;
+	while (true)
+	{
+		puts("输入要删除的学号：");
+		cin >> num;
+		int i = 0;
+		while (SBClass[i].nUmber != num)i++;
+		SBClass[i].nUmber = -1;
+		save();
+		while (1) {
+			puts("是否继续....Y/N");
+			cin >> c;
+			cin.get();
+			if (c == 'n' || c == 'N' || c == 'y' || c == 'Y') {
+				break;
+			}
+			else {
+				cout << "请重新输入\a" << endl;
+				cin.clear();
+				cin.ignore(100, '\n');
+			}
+		}
+		if (c == 'n' || c == 'N')break;
+	}
+}
+
+void change(){
+	int num=0;
+	char c=1;
+	int x;
+	see();
+		puts("输入要修改的学号：");
+		cin >> num;
+		cin.get();
+		int i = 0;
+		while (SBClass[i].nUmber != num)i++;
+		while (c)
 		{
-			Onlogin(hwndDlg);   // goto 登录界面
-			return TRUE;
+			puts("请选择修改的功能:");
+			puts("1.修改学号---");
+			puts("2.修改姓名---");
+			puts("3.修改成绩---");
+			puts("0.返还主菜单--");
+			cin >> x;
+			cin.get();
+			switch (x)
+			{
+			case 1:
+				puts("请输入要修改的学号：");
+				cin >> SBClass[i].nUmber;
+			//	SBClass[i].nUmber = nUmber;
+				cin.get();
+				break;
+			case 2:
+				puts("请输入要修改的姓名：");
+				getline(cin, SBClass[i].name);
+			//	SBClass[i].name = name;
+				break;
+			case 3:
+				puts("请输入要修改的成绩：");
+				cin >> SBClass[i].vale;
+			//	SBClass[i].vale = vale;
+				cin.get();
+				break;
+			case 0:
+				c = 0;
+				break;
+			default:
+				puts("请重新输入！！！");
+				break;
+			}
+
 		}
-	
+		save();
+			cout << "学号是：" << SBClass[i].nUmber << "   姓名是：" << SBClass[i].name << "   成绩是：" << SBClass[i].vale << endl;
+			system("pause");
+}
+
+void fid() {
+
+	int i = 0;
+	int num = 0;
+	puts("输入要查找的学号：");
+	while (1) {
+		cin >> num;
+		if (cin.fail())
+		{
+			cout << "请重新输入\a" << endl;
+			cin.clear();
+			cin.ignore(100, '\n');
+			continue;
+		}
+		break;
+	}
+		while (SBClass[i].nUmber != num)i++;
+		cout << "学号是：" << SBClass[i].nUmber << "   姓名是：" << SBClass[i].name << "   成绩是：" << SBClass[i].vale << endl;
+
+		system("pause");
+
+
+}
+
+
+int main() {
+	Read();
+	/*while (login()) {
+		system("cls");
+		cout << "账号或者密码错误请重新输入！" << endl;
+	}
+*/
+
+	while (true)
+	{
+		system("cls");
+		menu();
+		int x = 0;
+		cout << "请选择：";
+		cin >> x;
+
+		switch (x)
+		{
+		case 1:
+			see();
+			break;
+		case 2:
+			add();
+			break;
+		case 3:
+			system("cls");
+			delt();
+			break;
+		case 4:
+			change();
+			break;
+		case 5:
+			fid();
+			break;
+		case 0:
+			return 0;
+		default:
+			puts("请重新输入");
+			break;
+		}	
 	}
 
 
-	return FALSE;
-}
-
-
-int APIENTRY  WinMain(HINSTANCE hInstance,HINSTANCE hPrev,LPSTR lpCmd,int nCmadShow) {
-
-	if (DialogBox(hInstance, (LPCTSTR)IDD_LOGIN, NULL, logPro)==IDCANCEL)
-		return 0;
-	DialogBox(hInstance, (LPCTSTR)ID_MAIN, NULL, pro);
-
-
-
-/*
-	HWND hk = FindWindow(NULL,"666.txt - 画图" );
-	MessageBox(hk, "只狼：DLC苇名城的大鸡鸡", "温馨提示", MB_OKCANCEL | MB_ICONEXCLAMATION);
-
-	*/
-
+	system("pause");
 	return 0;
 }
